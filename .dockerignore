@@ -1,0 +1,14 @@
+# VCS / local
+.git
+.gitignore
+
+# Dependencies / builds
+node_modules
+.next
+dist
+out
+
+# Local env / data
+.env
+*.db
+public/uploads

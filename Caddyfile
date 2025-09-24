@@ -1,0 +1,14 @@
+{$DOMAIN} {
+    encode zstd gzip
+
+    @uploads path /uploads/*
+    handle @uploads {
+        root * /data/uploads
+        file_server
+        header {
+            X-Content-Type-Type nosniff
+        }
+    }
+
+    reverse_proxy app:3000
+}
