@@ -1,0 +1,41 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Builds / artifacts
+.next/
+out/
+dist/
+.turbo/
+*.tsbuildinfo
+
+# Local env (keep example tracked)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Prisma (cache) + local SQLite DB
+.prisma/
+dev.db
+*.db
+*.db-journal
+
+# Uploaded customer docs (MVP local storage)
+public/uploads/
+
+# Vercel / tooling
+.vercel/
+
+# OS & editors
+.DS_Store
+Thumbs.db
+ehthumbs.db
+.idea/
+.vscode/
+.history/
+*.orig
+*.rej
