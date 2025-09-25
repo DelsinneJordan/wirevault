@@ -1,4 +1,3 @@
-// app/b/[shortId]/page.tsx   (GET on old board QR without session)
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 

@@ -25,21 +25,14 @@ model Site {
 }
 
 model Board {
-  id      Int    @id @default(autoincrement())
-  shortId String @unique
-  name    String
-
-  // NEW site relation (optional for Step A)
-  siteId Int?
-  site   Site? @relation(fields: [siteId], references: [id])
-
-  // --- keep these legacy columns for backfill ---
-  customerName String?
-  siteAddress  String?
-  qrTokenId    Int? // keep as a plain scalar (no relation)
-  // ---------------------------------------------
-
-  // (your electrical details…)
+  id             Int           @id @default(autoincrement())
+  shortId        String        @unique
+  name           String
+  siteId         Int?
+  site           Site?         @relation(fields: [siteId], references: [id])
+  customerName   String?
+  siteAddress    String?
+  qrTokenId      Int? // keep as a plain scalar (no relation)
   type           String?
   supplyType     String?
   voltage        String?
@@ -51,14 +44,12 @@ model Board {
   description    String?
   lastInspection DateTime?
   nextInspection DateTime?
-
-  state     String   @default("ACTIVE")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  docs       BoardDoc[]
-  accessLogs AccessLog[]
-  changes    BoardChange[]
+  state          String        @default("ACTIVE")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  docs           BoardDoc[]
+  accessLogs     AccessLog[]
+  changes        BoardChange[]
 }
 
 model BoardDoc {

@@ -1,5 +1,4 @@
 import type { NextRequest } from 'next/server'
-
 export function getRequestOrigin(req: NextRequest) {
   const xfProto = req.headers.get('x-forwarded-proto')
   const xfHost  = req.headers.get('x-forwarded-host')
@@ -7,3 +6,4 @@ export function getRequestOrigin(req: NextRequest) {
   const proto   = xfProto ?? (host.includes('localhost') || host.startsWith('127.') ? 'http' : 'https')
   return `${proto}://${host}`
 }
+
