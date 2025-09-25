@@ -1,3 +1,4 @@
+// ---------- generator & datasource ----------
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,20 +8,75 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Board {
-  id           Int        @id @default(autoincrement())
-  shortId      String     @unique
-  name         String
-  customerName String
-  siteAddress  String
-  state        String     @default("ACTIVE")
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+// ---------- models ----------
 
-  docs         BoardDoc[]
-  qrToken      QrToken?   @relation(fields: [qrTokenId], references: [id])
-  qrTokenId    Int?       @unique
-  accessLogs   AccessLog[]
+model Site {
+  id        Int      @id @default(autoincrement())
+  shortId   String   @unique
+  name      String
+  customer  String
+  address   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  boards     Board[]
+  qrTokens   QrToken[]
+  accessLogs AccessLog[]
+}
+
+model Board {
+  id      Int    @id @default(autoincrement())
+  shortId String @unique
+  name    String
+
+  // NEW site relation (optional for Step A)
+  siteId Int?
+  site   Site? @relation(fields: [siteId], references: [id])
+
+  // --- keep these legacy columns for backfill ---
+  customerName String?
+  siteAddress  String?
+  qrTokenId    Int? // keep as a plain scalar (no relation)
+  // ---------------------------------------------
+
+  // (your electrical details…)
+  type           String?
+  supplyType     String?
+  voltage        String?
+  earthingSystem String?
+  incomingCable  String?
+  ratedCurrent   String?
+  frequency      String?
+  solar          Boolean?
+  description    String?
+  lastInspection DateTime?
+  nextInspection DateTime?
+
+  state     String   @default("ACTIVE")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  docs       BoardDoc[]
+  accessLogs AccessLog[]
+  changes    BoardChange[]
+}
+
+model BoardDoc {
+  id         Int      @id @default(autoincrement())
+  boardId    Int
+  board      Board    @relation(fields: [boardId], references: [id])
+  label      String
+  mime       String
+  storageKey String
+  createdAt  DateTime @default(now())
+}
+
+model BoardChange {
+  id        Int      @id @default(autoincrement())
+  boardId   Int
+  board     Board    @relation(fields: [boardId], references: [id])
+  message   String
+  createdAt DateTime @default(now())
 }
 
 model QrToken {
@@ -28,33 +84,29 @@ model QrToken {
   shortId   String   @unique
   pinHash   String
   status    String   @default("UNASSIGNED") // UNASSIGNED | ASSIGNED | RETIRED
+  // Now links to Site (0..n tokens per site)
+  siteId    Int?
+  site      Site?    @relation(fields: [siteId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  board     Board?
-}
-
-model BoardDoc {
-  id         Int      @id @default(autoincrement())
-  boardId    Int
-  label      String
-  mime       String
-  storageKey String
-  createdAt  DateTime @default(now())
-
-  board      Board    @relation(fields: [boardId], references: [id])
 }
 
 model AccessLog {
-  id         Int      @id @default(autoincrement())
-  boardId    Int?
-  shortId    String
-  success    Boolean
-  ip         String?
-  userAgent  String?
-  createdAt  DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
 
-  board      Board?   @relation(fields: [boardId], references: [id])
+  // what was accessed / attempted
+  shortId   String
+  success   Boolean
+  ip        String?
+  userAgent String?
+
+  // optional links to Site/Board for context
+  siteId Int?
+  site   Site? @relation(fields: [siteId], references: [id])
+
+  boardId Int?
+  board   Board? @relation(fields: [boardId], references: [id])
 }
 
 model User {

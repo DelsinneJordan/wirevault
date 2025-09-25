@@ -65,6 +65,25 @@ export function buildAdminSessionCookie(email: string) {
   }
 }
 
+export function buildSiteSessionCookie(siteShortId: string) {
+  const TTL = Number(process.env.SESSION_TTL_MINUTES || 20)
+  const isProd = process.env.NODE_ENV === 'production'
+  const token = Buffer.from(JSON.stringify({ siteShortId, exp: Date.now() + TTL*60_000 })).toString('base64url')
+  return {
+    name: `wvsite:${siteShortId}`,
+    value: token,
+    options: { httpOnly: true, secure: isProd, sameSite: 'lax' as const, path: '/', maxAge: TTL * 60 }
+  }
+}
+export function getSiteSession(siteShortId: string) {
+  const raw = nextCookies().get(`wvsite:${siteShortId}`)?.value
+  if (!raw) return null
+  try {
+    const { siteShortId: s, exp } = dec<{ siteShortId: string; exp: number }>(raw)
+    return s === siteShortId && Date.now() < exp ? { siteShortId: s } : null
+  } catch { return null }
+}
+
 export function setAdminSession(email: string) {
   const c = buildAdminSessionCookie(email)
   nextCookies().set(c.name, c.value, c.options)
